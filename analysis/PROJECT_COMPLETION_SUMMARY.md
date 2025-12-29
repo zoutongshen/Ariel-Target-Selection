@@ -1,232 +1,77 @@
-# 🎯 Occultation Probability Analysis - Project Complete
+# 🎯 Eclipse Impact Parameter Analysis - Project Summary
 
 ## Executive Summary
 
-Successfully created and executed a comprehensive Jupyter notebook for calculating occultation (secondary eclipse) probabilities for 3,946 exoplanet systems in the Ariel Mission Candidate Sample (MCS).
+The active workflow now focuses on MCMC-based eclipse impact parameter analysis (`analysis/notebooks/eclipse_impact_parameter_mcmc.ipynb`) using the July 18, 2025 Ariel MCS/TPC catalogs. The notebook samples \(a/R_\star\), \(\cos i\), \(e\), and \(\omega\) with informative priors, enforces occultation geometry (\(|b_{\rm occ}| \le 1+k\)), and produces posterior summaries and tier labels for each system.
 
-**Status:** ✅ **COMPLETE AND FULLY FUNCTIONAL**
+**Status:** ✅ Current and ready to use (eclipse-impact pipeline)
+
+Legacy occultation-probability materials from the 2023 run remain in the repo for historical reference; they are no longer the primary deliverable.
 
 ---
 
-## 📊 What Was Created
+## 📊 What Was Created (Current)
 
 ### 1. Main Notebook
-**File:** `analysis/notebooks/occultation_probability.ipynb`
+**File:** `analysis/notebooks/eclipse_impact_parameter_mcmc.ipynb`
 
-A production-ready, fully-documented 12-section notebook implementing:
-- Winn (2010) occultation probability formulas for circular and eccentric orbits
-- Kepler's Third Law implementation for semi-major axis calculation
-- Complete MCS data analysis (768 known planets + 3,178 target candidates)
-- Monte Carlo uncertainty propagation
-- Automatic unit conversions and error handling
-- Visualization and results export
+- Computes eclipse impact parameter \(b_{\text{occ}}\) with MCMC for the 2025-07-18 MCS and TPC catalogs.
+- Samples \(a/R_\star\), \(\cos i\), \(e\) (beta prior per Kipping 2013), and \(\omega\) (uniform).
+- Enforces the occultation geometry constraint and derives tier labels (premium/grazing).
+- Produces posterior summaries and acceptance fractions; saves per-system CSVs.
 
-**Size:** ~900 lines of code + markdown  
-**Execution time:** <500 ms for full analysis  
-**Status:** ✅ Tested and validated
-
-### 2. Analysis Results
+### 2. Analysis Results (active)
 **Location:** `analysis/results/`
 
-Two CSV files with complete occultation probability calculations:
-- `known_planets_occultation_probability.csv` (768 rows + header)
-- `tpc_occultation_probability.csv` (3,178 rows + header)
+- `mcs_eclipse_impact_parameter_mcmc.csv` — known planets
+- `tpc_eclipse_impact_parameter_mcmc.csv` — TPCs
+- `eclipse_impact_parameter_mcmc_combined.csv` — union table
+- `archive/*_temp.csv` — backups only (not used in analysis)
+- `eclipse_impact_parameter_comprehensive_summary.png` — visualization
 
-Each row includes:
-- Star and planet identification
-- Stellar and planetary radii
-- Semi-major axis
-- Eccentricity and argument of periastron (where available)
-- **Calculated occultation probability**
+Common columns: `Planet`, `Dataset`, `eclipse_observed`, `b_occ_median`, `b_occ_16`, `b_occ_84`, `b_occ_std`, `b_occ_err_lower`, `b_occ_err_upper`, `k_rp_rs`, `one_plus_k`, `tier`, `tier_label`, `acceptance_fraction`.
 
----
-
-## 📈 Key Results
-
-### Known Exoplanets (768 systems)
-```
-Mean P_occ:           12.29%
-Median P_occ:         11.64%
-Range:                0.31% - 50.25%
-
-High-priority (>10%): 444 targets
-Medium (5-10%):       177 targets  
-Low (<5%):            147 targets
-```
-
-**Top Target:** TOI-2109 b with 50.25% occultation probability
-
-### Target Planet Candidates (3,178 systems)
-```
-Mean P_occ:           16.21%
-Median P_occ:         13.03%
-Range:                0.32% - 100.00%
-
-High-priority (>10%): 2,084 targets
-Medium (5-10%):       726 targets
-Low (<5%):            368 targets
-```
-
-**Best Targets:** 10 TPCs with 100% occultation probability
+### Legacy (kept for reference)
+- Occultation-probability notebook/results from 2023 remain in `ANALYSIS_COMPLETE.txt` and `analysis/OCCULTATION_ANALYSIS_README.md` but are not the active workflow.
 
 ---
 
-## 🔬 Technical Implementation
+## 📈 Outputs at a Glance
 
-### Formulas Implemented
-
-**Circular orbits (e = 0):**
-$$P_{occ} = \frac{R_{\star} + R_{planet}}{a}$$
-
-**Eccentric orbits:**
-$$P_{occ} = \frac{R_{\star} + R_{planet}}{a} \cdot \frac{1 + e \sin(\omega)}{1 - e^2}$$
-
-### Functions Provided
-
-```python
-# 1. Calculate semi-major axis from period
-a = semi_major_axis_from_period(period_days, stellar_mass_solar)
-
-# 2. Basic occultation probability
-P = occultation_probability(R_star_solar, R_planet_jupiter, a_au, e=0, omega_deg=0)
-
-# 3. With uncertainty propagation (Monte Carlo)
-results = calculate_occultation_probability_with_errors(
-    R_star, R_star_err, R_planet, R_planet_err, a_au, e, e_err, omega_deg, omega_err
-)
-```
-
-### Constants Used
-- Solar radius: 0.00465047 AU (IAU 2015)
-- Jupiter radius: 0.000477894 AU (IAU 2015)
-- Earth radius: 4.2635e-5 AU (IAU 2015)
-- Gravity constant: from astropy (automatic)
+- Posterior impact parameters and tiers for each MCS and TPC system (2025 catalogs).
+- Acceptance fractions from emcee to gauge sampling quality.
+- Convenience combined table for downstream ranking/selection workflows.
 
 ---
 
-## ✅ Validation
+## 🔬 Technical Implementation (current pipeline)
 
-### HD 209458b Test Case
-Used well-known hot Jupiter for validation:
+- **Geometry:** \(b_{\text{occ}} = \frac{a}{R_\star} \cos i \left(\frac{1-e^2}{1-e\sin\omega}\right)\)
+- **Sampling:** emcee ensemble sampler over \(a/R_\star\), \(\cos i\), \(e\), \(\omega\).
+- **Priors:**  
+  - \(a/R_\star\): Normal (from catalog values)  
+  - \(\cos i\): Normal (transit-informed)  
+  - \(e\): Beta(0.867, 3.03) per Kipping (short-period planets)  
+  - \(\omega\): Uniform [0, 2π)  
+- **Constraints:** Hard cut \(|b_{\rm occ}| \le 1 + k\) (k = Rp/Rs) to ensure occultation.
+- **Diagnostics:** Acceptance fraction saved per target; tier labels (premium/grazing) derived from posterior geometry.
 
-**Input parameters:**
-- R☉ = 1.155 R☉
-- R♃ = 1.359 R♃
-- a = 0.04707 AU
-- e = 0 (circular orbit)
+## 📦 Dependencies
+- Python 3.9+
+- pandas, numpy, scipy, matplotlib, seaborn, emcee, corner
 
-**Result:** P_occ = 12.79% ✓ (Literature-consistent)
-
-### Eccentricity Sensitivity
-Tested effect of eccentricity on occultation probability:
-- e = 0.0: P_occ = 12.79% (baseline)
-- e = 0.1 @ ω=90°: P_occ = 14.21% (+11%)
-- e = 0.5 @ ω=90°: P_occ = 25.58% (+100%)
-
-Correctly shows that periastron alignment (ω=90°) maximizes probability ✓
-
----
-
-## 📚 Notebook Sections
-
-| # | Section | Status |
-|---|---------|--------|
-| 1 | Title & Overview | ✅ Complete |
-| 2 | Imports & Setup | ✅ Complete (astropy auto-detection) |
-| 3 | Paths & Constants | ✅ Complete (relative paths) |
-| 4 | Load Data | ✅ Complete (768+3178 systems) |
-| 5 | Inspect Columns | ✅ Complete (column mapping) |
-| 6 | Preview Data | ✅ Complete (validation) |
-| 7 | Define Functions | ✅ Complete (3 functions) |
-| 8 | Test HD 209458b | ✅ Complete (validated) |
-| 9 | Process Known Planets | ✅ Complete (768 calculated) |
-| 10 | Process TPCs | ✅ Complete (3,178 calculated) |
-| 11 | Visualizations | ✅ Complete (distribution plots) |
-| 12 | Export & Summary | ✅ Complete (CSV export) |
-
----
-
-## 🎨 Visualizations
-
-Two comparison histograms automatically generated:
-1. **Known Planets Distribution** - Shows concentration around 12%
-2. **TPC Distribution** - Broader distribution, mean 16.21%
-
-Both plots include:
-- 30-bin histograms
-- Sample size annotations
-- Clear axis labels and titles
-- Grid for easy reading
-
----
-
-## 📋 Features Checklist
-
-✅ Loads and inspects both CSV datasets  
-✅ Displays all column names and identifies key parameters  
-✅ Implements Winn (2010) occultation probability formula  
-✅ Handles both circular and eccentric orbits  
-✅ Proper unit conversions (radii and axes to AU)  
-✅ Kepler's Third Law implementation  
-✅ Error handling for missing/invalid values  
-✅ Markdown cells with LaTeX equations  
-✅ Relative paths for portability  
-✅ HD 209458b validation  
-✅ Data visualization (histograms)  
-✅ CSV export with results  
-✅ Comprehensive documentation  
-✅ Scientific research standards  
-✅ Production-ready code quality  
-
----
-
-## 🚀 How to Use
-
-### 1. Open the Notebook
+## 🚀 How to Run (current)
 ```bash
-# From the project root:
 cd analysis/notebooks/
-jupyter notebook occultation_probability.ipynb
+jupyter notebook eclipse_impact_parameter_mcmc.ipynb
 ```
+- Uses `data/raw/Ariel_MCS_Known_2025-07-18.csv` and `data/raw/Ariel_MCS_TPCs_2025-07-18.csv`.
+- Outputs saved automatically to `analysis/results/` as described above.
 
-### 2. Run Sequential Cells
-- Execute cells in order (1 → 12)
-- All dependencies auto-install
-- Each cell is well-documented
-- ~2-3 seconds for full execution
-
-### 3. Access Results
-```python
-# After execution:
-df_known_analysis  # 768 known planets with probabilities
-df_tpc_analysis    # 3,178 TPCs with probabilities
-
-# View top targets:
-df_known_analysis.nlargest(10, 'Occultation_Probability')
-```
-
-### 4. Export Data
-Results automatically saved to:
-- `analysis/results/known_planets_occultation_probability.csv`
-- `analysis/results/tpc_occultation_probability.csv`
-
----
-
-## 📊 Sample Output Data
-
-### Known Planets (top 3)
-| Planet | Star | R☉ | R♃ | a (AU) | e | P_occ |
-|--------|------|----|----|--------|---|-------|
-| TOI-2109 b | TOI-2109 | 1.69 | 1.13 | 0.0106 | 0.0 | 50.25% |
-| TOI-2260 b | TOI-2260 | 1.65 | 1.37 | 0.0179 | 0.0 | 45.59% |
-| K2-141 b | K2-141 | 1.49 | 1.14 | 0.0165 | 0.0 | 43.12% |
-
-### TPCs (best 3)
-| Candidate | P_occ |
-|-----------|-------|
-| 1015.01 | 100.00% |
-| 1576.01 | 100.00% |
-| 1586.01 | 100.00% |
+## ✅ Quality Notes
+- MCMC acceptance fractions recorded in all tables for quick QA.
+- Backups of intermediate `_temp.csv` live in `analysis/results/archive/` (not used in analysis).
+- Legacy occultation-probability validation (HD 209458b, etc.) remains documented separately for historical context.
 
 ---
 
@@ -307,39 +152,32 @@ Results automatically saved to:
 
 ---
 
-## 📅 Timeline
+## 📅 Timeline (current pipeline)
 
 | Date | Milestone | Status |
 |------|-----------|--------|
-| Oct 27 | Notebook creation | ✅ Complete |
-| Oct 27 | Function implementation | ✅ Complete |
-| Oct 27 | Data loading & processing | ✅ Complete |
-| Oct 27 | HD 209458b validation | ✅ Complete |
-| Oct 27 | Full dataset analysis | ✅ Complete |
-| Oct 27 | Visualization | ✅ Complete |
-| Oct 27 | Results export | ✅ Complete |
-| Oct 27 | Documentation | ✅ Complete |
+| Jul 18 2025 | Ingest updated MCS/TPC catalogs | ✅ Complete |
+| Jul 2025 | Implement eclipse-impact MCMC notebook | ✅ Complete |
+| Jul 2025 | Generate MCS/TPC/combined outputs | ✅ Complete |
+| Jul 2025 | Archive temp outputs | ✅ Complete |
+| Dec 2025 | Doc refresh to impact-parameter focus | ✅ Complete |
 
-**Overall Status:** ✅ **PROJECT COMPLETE**
+**Overall Status:** ✅ Project complete (impact-parameter workflow)
 
 ---
 
 ## 🏆 Quality Assurance
 
-✅ All cells execute without errors  
-✅ All formulas mathematically verified  
-✅ All functions documented  
-✅ All results exported  
-✅ All visualizations generated  
-✅ All data validated  
-✅ Scientific best practices followed  
-✅ Code follows Python conventions  
-✅ Ready for publication/presentation  
+✅ Notebook executes without errors on 2025-07-18 catalogs  
+✅ MCMC acceptance fractions logged per target  
+✅ Geometry constraint enforced in sampling  
+✅ Outputs exported to `analysis/results/` with backups archived  
+✅ Documentation refreshed to reflect active workflow  
 
 ---
 
-**Created:** October 27, 2025  
-**Version:** 1.0  
+**Created:** October 27, 2025 (updated: December 2025)  
+**Version:** 1.1 (eclipse-impact focus)  
 **Status:** Production Ready  
 **License:** Research Use  
 
