@@ -220,3 +220,4 @@ When you run this workflow:
 Follow this recipe, and you’ll have a fully traceable, publication‑grade analysis pipeline consistent with Ariel’s internal data practices and ready to feed into your target selection or eclipse‑occurrence statistics.
 
 1. https://github.com/arielmission-space/Mission_Candidate_Sample/commit/3642610c1e5333e7c757256313279de367b029f7#diff-75e69b4b2954d5ca82018a4faae588de78f56076b1fb8dd067a6e81f0f550751
+
