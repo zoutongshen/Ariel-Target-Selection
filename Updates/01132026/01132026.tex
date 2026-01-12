@@ -1,0 +1,976 @@
+% --------------------------------------------------------------------
+% LaTeX beamer slide example for Leiden slides
+% Copyright LaTeX template: 2009-2010 by Joost Schalken
+% --------------------------------------------------------------------
+
+% ====================================================================
+% Setup of slide environment
+\batchmode % Do not display issues with package loading
+\documentclass[t,11pt]{beamer}
+
+% --------------------------------------------------------------------
+% Load packages
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{multirow}
+\usepackage{tikz}
+\usetikzlibrary{calc,trees,positioning,arrows,chains,shapes.geometric,%
+    decorations.pathreplacing,decorations.pathmorphing,shapes,%
+    matrix,shapes.symbols}
+\usepackage{listings}
+\lstset{tabsize=2,showspaces=false,showtabs=false,basicstyle=\ttfamily\mdseries\itshape\normalsize}
+
+% --------------------------------------------------------------------
+% Beamer version theme settings
+\usetheme[
+    faculty=sciences,  % humanities, law, medicine, sciences, socialsciences
+    lang=en,           % en, nl
+    rmfont=pmn,
+    logofont=fpi,
+    %totalpages=off    % Disable total number of slides
+]{leiden}
+%\usetheme[faculty=sciences,lang=en]{leiden}
+
+% Remove navigation symbols
+\setbeamertemplate{navigation symbols}{}
+
+% Better default font
+\usepackage{iwona}
+\usepackage[textfont={scriptsize,it}]{caption}
+\setbeamerfont{caption}{size=\scriptsize}
+\renewcommand*{\familydefault}{\sfdefault}
+
+
+
+
+% --------------------------------------------------------------------
+\def\liketitle#1{%
+{\usebeamerfont{frametitle}\usebeamercolor[fg]{frametitle}%
+\begin{flushleft}%
+\vspace{-\baselineskip}% Cometic correction for space introduced by flushleft
+#1\par
+\end{flushleft}%
+\vspace{-\baselineskip}% Cosmetic correction for space introduced by flushleft
+}%
+\vspace{0.75\baselineskip}%
+}
+
+% --------------------------------------------------------------------
+\setbeameroption{hide notes}
+%\setbeameroption{show notes}
+%\setbeameroption{show notes on second screen}
+
+% --------------------------------------------------------------------
+\nonstopmode % Include issues with the slides
+
+
+% ====================================================================
+% Header settings
+\def\lecturename{Project Update}
+\lecture[Update on b\_occ for MCs and TPCs]{Update on b\_occ for MCs and TPCs}{ldn-bmr}
+\subtitle{b\_occ distributions, e model and more}
+\date{Jan 13th, 2026}
+\title{\insertlecture}
+\author{Zoutong Shen}
+\institute{Universiteit Leiden}
+\subject{Project Update: \lecturename}
+
+
+% ====================================================================
+% Main part
+
+% --------------------------------------------------------------------
+\batchmode % Do not include issues with the package definitions
+\begin{document}
+\nonstopmode % Include issues with the slides
+
+
+% ====================================================================
+\section*{Introduction}
+
+% --------------------------------------------------------------------
+{
+\setbeamertemplate{navigation symbols}{}
+\begin{frame}[plain]
+  \maketitle
+\end{frame}
+\addtocounter{framenumber}{-1}% don't count the title slide.
+}
+
+% --------------------------------------------------------------------
+\begin{frame}{Table of Contents}
+  \tableofcontents[sectionstyle=show/show, hideallsubsections]
+\end{frame}
+
+
+% ====================================================================
+\section{Problem to be solved}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Eclipse potential for transiting planets}
+The main goal of this project is to estimate the eclipsing potential for all the candidates within the current MCs and TPCs catalogues. 
+
+\vspace{0.5\baselineskip}
+
+Although a planet is detected via the transit method, it does not guarantee that the planet will also eclipse its host star due to non-zero eccentricty from a pure geometric perspective. 
+
+\vspace{0.5\baselineskip}
+
+We want to quantify and estimate the potential of those transiting planets to eclipse their host stars to maximize the budget for Ariel project. 
+\end{frame}
+
+% ====================================================================
+\section{Methodology}
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{What have been done (1/2)}
+In the MCs raw catalog, the eclipse column has flagged the planets to be "FALSE", "Grazing", "Semi-Grazing" and "TRUE". 
+
+\vspace{0.5\baselineskip}
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+\textbf{Eclipse} & \textbf{Count} \\
+\midrule
+TRUE & 766 \\
+Grazing & 5 \\
+Semi-Grazing & 26 \\
+FALSE & 11 \\
+
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.5\baselineskip}
+
+However, it is not clear how the flagging is done, and based on Edward et al. 2019, the assumed $b_{\text{transit}}$ is 0.5.
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{What have been done (2/2)}
+In TPCs catalog, due to a lack of eccentricity and argument of periastron, there is no eclipse flagging. 
+
+\vspace{0.5\baselineskip}
+
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Current Methodology: b\_occ(1/2)}
+Just as $b_{\text{transit}}$ defines the transit geometry, we can define $b_{\text{occ}}$ as the impact parameter for eclipse geometry. According to Winn 2010,
+
+$$b_{\text{occ}} = \frac{a}{R_\star} \cos i \left(\frac{1 - e^2}{1 - e \sin \omega}\right)$$
+
+\vspace{0.5\baselineskip}
+
+where:
+\begin{itemize}
+\item $a/R_\star$ = scaled semi-major axis (sampled as single parameter)
+\item $i$ = orbital inclination
+\item $e$ = eccentricity
+\item $\omega$ = argument of periastron
+\end{itemize}
+
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Current Methodology: b\_occ(2/2)}
+According to Winn 2010, there could be three scenarios for eclipse geometry:
+
+\vspace{0.3\baselineskip}
+
+\begin{itemize}
+\item $b_{\text{occ}} < 1-k$ : Eclipsing
+\item $1-k < b_{\text{occ}} < 1+k$ : Grazing
+\item $b_{\text{occ}} > 1+k$ : Beyond
+\end{itemize}
+
+\vspace{0.3\baselineskip}
+
+where $k = R_p/R_\star$.
+\end{frame}
+
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Current Methodology: MCMC(1/2)}
+In MCs catalog, the $a/R_\star$, $i$, $e$ and $\omega$ are provided with uncertainties. 
+
+In TPCs catalog, the same columns exist. However, $a/R_\star$ does not have uncertainties, and $i = 90$, $e = 0$ and $\omega = 0$ are set to constant. 
+
+\vspace{0.5\baselineskip}
+I propose to use MCMC to sample those parameters and calculate the $b_{\text{occ}}$ distribution for each planet in both catalogues, and see how the $b_{\text{occ}}$ distribution matches the definition of "eclipsing", "grazing" and "beyond". 
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Current Methodology: MCMC(2/2)}
+\small
+MCMC samples 4 parameters to propagate uncertainties through $b_{\text{occ}}$ calculation:
+
+\vspace{0.3\baselineskip}
+
+\begin{center}
+\begin{tabular}{llc}
+\toprule
+\textbf{Parameter} & \textbf{Prior Distribution} & \textbf{Bounds} \\
+\midrule
+$a/R_\star$ & Gaussian (transit fit)$^\dagger$ & $(0, \infty)$ \\
+$\cos i$ & Gaussian (transit fit)$^\dagger$ & $[-1, 1]$ \\
+$e$ & Beta($\alpha$=0.867, $\beta$=3.03) + Gaussian* & $[0, 1)$ \\
+$\omega$ & Uniform + Gaussian* & $[0^\circ, 360^\circ)$ \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2\baselineskip}
+
+{\footnotesize 
+*Additional Gaussian constraint if RV measurements available\\
+$^\dagger$Asymmetric error bounds from database are averaged for symmetric Gaussian prior
+}
+
+\vspace{0.2\baselineskip}
+
+\textbf{Configuration:} 32 walkers, 3000 steps, 500 burn-in steps
+\end{frame}
+
+% ====================================================================
+\section{Results}
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{MCMC Results (1/2)}
+\small
+MCMC Results Summary (808 MCS + 1638 TPC = 2446 total systems):
+
+\vspace{0.3\baselineskip}
+
+\begin{center}
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Statistic} & \textbf{MCS} & \textbf{TPC} & \textbf{All} \\
+\midrule
+\multicolumn{4}{l}{\textit{$b_{\text{occ}}$ Distribution}} \\
+Mean & 0.452 & 0.000 & 0.128 \\
+Median & 0.424 & 0.000 & 0.001 \\
+Std Dev & 0.281 & 0.004 & 0.252 \\
+Min & $-0.948$ & $-0.026$ & $-0.948$ \\
+Max & 1.845 & 0.037 & 1.845 \\[0.2em]
+\multicolumn{4}{l}{\textit{Acceptance Fraction}} \\
+Mean & 0.513 & 0.496 & 0.501 \\
+Std Dev & 0.045 & 0.002 & 0.025 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2\baselineskip}
+
+{\footnotesize TPC systems have near-zero $b_{\text{occ}}$ due to assumed circular orbits ($e=0$, $i=90^\circ$)}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{MCMC Results (2/2)}
+
+\textbf{Visualization Strategy:}
+
+\vspace{0.3\baselineskip}
+
+For each planet, we plot the posterior $b_{\text{occ}}$ distribution showing:
+
+\begin{itemize}
+\item Median value (central estimate)
+\item $\pm1\sigma$ and $\pm2\sigma$ intervals (68\% and 95\% credible regions)
+\item Eclipse boundaries: $1-k$ (grazing threshold) and $1+k$ (beyond eclipse)
+\end{itemize}
+
+\vspace{0.5\baselineskip}
+
+\textbf{Key Insight:} Comparing the $b_{\text{occ}}$ distribution shape to the $1\pm k$ boundaries reveals the eclipse probability for each system, accounting for observational uncertainties in orbital parameters.
+
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Visualization: MCs (1/2)}
+\begin{figure}
+\centering
+\includegraphics[width=0.95\textwidth,height=0.75\textheight,keepaspectratio]{img/violin_mcs_top100.png}
+\caption{$b_{\text{occ}}$ distributions for top 100 MCS systems (violin plots)}
+\end{figure}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Visualization: MCs (2/2)}
+\begin{figure}
+\centering
+\includegraphics[width=0.95\textwidth,height=0.75\textheight,keepaspectratio]{img/mcs_top_50.png}
+\caption{$b_{\text{occ}}$ distributions for top 50 MCS systems with eclipse boundaries}
+\end{figure}
+\end{frame}
+
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Analysis: MCs (1/4)}
+\small
+\textbf{MCS Systems Summary} (808 systems with impact parameter data):
+
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Level} & \textbf{Central} & \textbf{Grazing} & \textbf{Beyond} \\
+\midrule
+Median (0$\sigma$) & 775 (95.9\%) & 23 (2.8\%) & 10 (1.2\%) \\
++1$\sigma$ & 686 (84.9\%) & 83 (10.3\%) & 39 (4.8\%) \\
++2$\sigma$ & 571 (70.7\%) & 101 (12.5\%) & 136 (16.8\%) \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Analysis: MCs (2/4)}
+\small
+\textbf{Eclipse Depth by Impact Parameter Category} (808 MCS systems):
+
+\vspace{0.3\baselineskip}
+
+\begin{center}
+\tiny
+\begin{tabular}{llrrr}
+\toprule
+\textbf{Level} & \textbf{Category} & \textbf{Total} & \textbf{Observed} & \textbf{Mean Depth [\%]} \\
+\midrule
+\multirow{3}{*}{$0\sigma$} & Central & 775 & 97 (12.5\%) & 0.0383 \\
+& Grazing & 23 & 2 (8.7\%) & 0.0482 \\
+& Beyond & 10 & 0 (0.0\%) & --- \\
+\midrule
+\multirow{3}{*}{$+1\sigma$} & Central & 686 & 88 (12.8\%) & 0.0388 \\
+& Grazing & 83 & 10 (12.0\%) & 0.0385 \\
+& Beyond & 39 & 1 (2.6\%) & --- \\
+\midrule
+\multirow{3}{*}{$+2\sigma$} & Central & 571 & 76 (13.3\%) & 0.0307 \\
+& Grazing & 101 & 16 (15.8\%) & 0.0820 \\
+& Beyond & 136 & 7 (5.1\%) & 0.0365 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2\baselineskip}
+
+{\footnotesize 
+Note: Mean depths calculated from systems with measured eclipse observations. 
+Impact parameter uncertainty shifts systems from Central to Grazing to Beyond categories.
+}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Analysis: MCs (3/4)}
+\textbf{Eclipse Depth by Impact Parameter Category} (808 MCS systems):
+\begin{figure}
+\centering
+\includegraphics[width=0.95\textwidth,height=0.75\textheight,keepaspectratio]{img/bocc_depth.png}
+\caption{Impact parameter vs eclipse depth across uncertainty levels (0$\sigma$, 1$\sigma$, 2$\sigma$)}
+\end{figure}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Analysis: MCs (4/4)}
+\tiny
+\textbf{Cross-match: Original Eclipse Flagging vs Calculated $b_{\text{occ}}$ Categories}
+
+\vspace{0.2\baselineskip}
+
+\begin{columns}
+\begin{column}{0.32\textwidth}
+\centering
+\textbf{0$\sigma$ (Median)}
+\vspace{0.1\baselineskip}
+
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Original} & \textbf{Cnt} & \textbf{Grz} & \textbf{Bey} \\
+\midrule
+TRUE & 766 & 0 & 0 \\
+Semi-Grz & 8 & 18 & 0 \\
+Grazing & 0 & 5 & 0 \\
+FALSE & 1 & 0 & 10 \\
+\midrule
+\textbf{Total} & 775 & 23 & 10 \\
+\bottomrule
+\end{tabular}
+\end{column}
+\begin{column}{0.32\textwidth}
+\centering
+\textbf{+1$\sigma$}
+\vspace{0.1\baselineskip}
+
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Original} & \textbf{Cnt} & \textbf{Grz} & \textbf{Bey} \\
+\midrule
+TRUE & 685 & 62 & 19 \\
+Semi-Grz & 1 & 19 & 6 \\
+Grazing & 0 & 2 & 3 \\
+FALSE & 0 & 0 & 11 \\
+\midrule
+\textbf{Total} & 686 & 83 & 39 \\
+\bottomrule
+\end{tabular}
+\end{column}
+\begin{column}{0.32\textwidth}
+\centering
+\textbf{+2$\sigma$}
+\vspace{0.1\baselineskip}
+
+\begin{tabular}{lrrr}
+\toprule
+\textbf{Original} & \textbf{Cnt} & \textbf{Grz} & \textbf{Bey} \\
+\midrule
+TRUE & 570 & 93 & 103 \\
+Semi-Grz & 1 & 7 & 18 \\
+Grazing & 0 & 1 & 4 \\
+FALSE & 0 & 0 & 11 \\
+\midrule
+\textbf{Total} & 571 & 101 & 136 \\
+\bottomrule
+\end{tabular}
+\end{column}
+\end{columns}
+
+\vspace{0.2\baselineskip}
+
+{\scriptsize
+Cnt = Central, Grz = Grazing, Bey = Beyond. Semi-Grz = Semi-Grazing.\\
+As uncertainty increases, systems migrate from Central $\rightarrow$ Grazing $\rightarrow$ Beyond.
+}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Analysis: MCs (4/4)}
+\tiny
+\textbf{Original Eclipse Categories: Distribution Across Calculated $b_{\text{occ}}$ Categories (\%)}
+
+\vspace{0.2\baselineskip}
+
+\begin{center}
+\begin{tabular}{llrrr}
+\toprule
+\textbf{Level} & \textbf{Original} & \textbf{Central} & \textbf{Grazing} & \textbf{Beyond} \\
+\midrule
+\multirow{4}{*}{$0\sigma$} & TRUE & 100.0\% & 0.0\% & 0.0\% \\
+& Semi-Grazing & 30.8\% & 69.2\% & 0.0\% \\
+& Grazing & 0.0\% & 100.0\% & 0.0\% \\
+& FALSE & 9.1\% & 0.0\% & 90.9\% \\
+\midrule
+\multirow{4}{*}{$+1\sigma$} & TRUE & 89.4\% & 8.1\% & 2.5\% \\
+& Semi-Grazing & 3.8\% & 73.1\% & 23.1\% \\
+& Grazing & 0.0\% & 40.0\% & 60.0\% \\
+& FALSE & 0.0\% & 0.0\% & 100.0\% \\
+\midrule
+\multirow{4}{*}{$+2\sigma$} & TRUE & 74.4\% & 12.1\% & 13.4\% \\
+& Semi-Grazing & 3.8\% & 26.9\% & 69.2\% \\
+& Grazing & 0.0\% & 20.0\% & 80.0\% \\
+& FALSE & 0.0\% & 0.0\% & 100.0\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{0.2\baselineskip}
+
+{\scriptsize
+\textbf{Key Findings:} 
+\begin{itemize}
+\item At 0$\sigma$ (median): Near-perfect agreement for TRUE (100\%) and FALSE (90.9\%)
+\item At 1$\sigma$: Balanced uncertainty - TRUE 89.4\% Central, FALSE 100\% Beyond
+\item At 2$\sigma$: Conservative - 74.4\% of TRUE systems still Central, 13.4\% migrate to Beyond
+\end{itemize}
+}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Issues encountered}
+\begin{itemize}
+\item In TPCs catalog, $a/R_\star$ does not have uncertainties, and $i = 90$, $e = 0$ and $\omega = 0$ are set to constant. This leads to near-zero $b_{\text{occ}}$ values and underestimates eclipse probabilities.
+\item Essentially their b\_occ is almost like b\_transit. And as they are sampled through transit detection, this doesn't help with target selection. 
+\item How do I incorperate the geometric eclipse probability to Tiers, which is defined against SNR and has nothing to do with b\_occ? 
+\end{itemize}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Visualization: TPCs}
+\begin{center}
+\includegraphics[width=0.95\textwidth,keepaspectratio]{img/tpc_top_50.png}
+\end{center}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Visualization: TPCs}
+\begin{center}
+\includegraphics[width=0.8\textwidth,keepaspectratio]{img/violin_tpc_top50.png}
+\end{center}
+\end{frame}
+
+
+% ====================================================================
+\section{Next Steps}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Option 1: Eccentricity Refinement (1/3)}
+
+Currently we adopted the beta distribution from Kipping (2013) as the prior for eccentricity sampling. Recent studies from Stevenson et al. (2025) suggested two local models for Rayleigh + Exponential ($\alpha$, $\lambda$ $\sigma$) might have a better estimation for planet with short period. 
+It also tends to return a higher value for lower eccentricity. 
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Option 1: Eccentricity Refinement (2/3)}
+\begin{center}
+\includegraphics[width=0.65\textwidth,keepaspectratio]{img/e0_posterior.png}
+\end{center}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Option 1: Eccentricity Refinement (3/3)}
+\begin{center}
+\includegraphics[width=\textwidth,keepaspectratio]{img/small_e_posterior.png}
+\end{center}
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Option 2: Eccentricity Probability}
+
+Winn (2010) also provided a geometric probability for eclipse:
+$$P_{\text{eclipse}} = \left(\frac{R_\star + R_p}{a}\right) \left(\frac{1 + e \sin \omega}{1 - e^2}\right)$$
+But this uses the same parameters as b\_occ. Not sure whether this would provide additional information. 
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{Option 3: Individual System Analysis}
+Analyze those with actual eclpises with lightkurve to validate the method. However, if it does have eclipse, what matter is transit depth and not much about b\_occ, and as shown in previous MCs slides, there is no strong correlation between b\_occ and eclipse depth. Not sure whether this methodlogy is valid. 
+\end{frame}
+
+% --------------------------------------------------------------------
+\begin{frame}[fragile]{More Options}
+Need more brainstorming...
+\end{frame}
+
+
+
+
+
+% % --------------------------------------------------------------------
+% \begin{frame}[fragile]{Leiden theme special commands (2/2)}
+% \begin{itemize}
+% \item	\alert{\texttt{\textbackslash backgroundimageonslide}}: which
+% 		allows one to set a background image for the slide.
+% 		Setting the background image to empty removes the
+% 		background image.\\
+% \vspace{0.2\baselineskip}
+% 		Example: \verb|\backgroundimageonslide{chalkboard}|\\
+% \vspace{0.1\baselineskip}
+% 		to include the image chalkboard.png or chalkboard.jpg.\\
+% 		For best effect use the image resolution: \texttt{1280}x\texttt{915}px.
+% \vspace{0.5\baselineskip}
+
+% \item	\alert{\texttt{\textbackslash totalpages}}: which allows
+% 		one to set the amount of slides to something different
+% 		than the automatic total.\\
+% \vspace{0.2\baselineskip}
+% 		Example: \verb|\totalpages{40}|
+% \end{itemize}
+% \end{frame}
+
+
+
+
+% % ====================================================================
+% \section{What can be done with beamer-latex}
+
+% % --------------------------------------------------------------------
+% \begin{frame}[fragile]{What can be done with beamer?}
+% \begin{itemize}
+% \item	The beamer documentclass can create slides with \LaTeX.
+% \item	The beamer documentclass can be downloaded from:
+% 		\url{http://latex-beamer.sourceforge.net/}.
+% \item	A basic slide is created with:\\
+% \vspace{0.1\baselineskip}
+% \verb|\begin{frame}{<FRAME TITLE>}|\\
+% \verb|FRAME CONTENT|\\
+% \verb|\end{frame}|\\
+% \vspace{0.5\baselineskip}
+% \item	In the next slides we what is possible, plus some
+% 		code sniplets.
+% \end{itemize}
+% \end{frame}
+
+
+% % --------------------------------------------------------------------
+% \begin{frame}{Bullits on slide}
+% \begin{itemize}
+% \item \alert{Bullitted text:}
+%   \begin{itemize}
+%   \item Item 1
+%   \item Item 2
+%   \end{itemize}
+% \vspace{.5\baselineskip}
+
+% \item \alert{Numbered text:}
+%   \begin{enumerate}
+%   \item Item 3
+%   \item Item 4
+%   \end{enumerate}
+% \end{itemize}
+% \end{frame}
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}[fragile]{\LaTeX-code: Bullits on slide}
+% \footnotesize
+% \verb|\begin{frame}{Bullits on slide}|\\
+% \verb|\begin{itemize}|\\
+% \verb|\item \alert{Bullitted text:}|\\
+% \verb|  \begin{itemize}|\\
+% \verb|  \item Item 1|\\
+% \verb|  \item Item 2|\\
+% \verb|  \end{itemize}|\\
+% \verb|\vspace{.5\baselineskip}|\\
+% \verb||\\
+% \verb|\item \alert{Numbered text:}|\\
+% \verb|  \begin{enumerate}|\\
+% \verb|  \item Item 3|\\
+% \verb|  \item Item 4|\\
+% \verb|  \end{enumerate}|\\
+% \verb|\end{itemize}|\\
+% \verb|\end{frame}|\\
+% \end{frame}
+% \toggleslidecolors
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}{Inverted colors on slide}
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ac sem nibh, at iaculis nisl. Etiam condimentum mauris vel nibh volutpat gravida. Sed sit amet gravida nibh. Nulla facilisi. Nunc feugiat pharetra urna at laoreet. Donec adipiscing eros non orci scelerisque sed dictum turpis elementum. Integer tempus interdum urna ultricies rhoncus.
+% \end{frame}
+% \toggleslidecolors
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}[fragile]{\LaTeX-code: Inverted colors on slide}
+% \footnotesize
+% \verb|\toggleslidecolors|\\
+% \verb|\begin{frame}{Inverted colors on slide}|\\
+% \verb|  Lorem ipsum dolor sit amet, consectetur adipiscing elit. [...]|\\
+% \verb|\end{frame}|\\
+% \verb|\toggleslidecolors|\\
+% \end{frame}
+% \toggleslidecolors
+
+% % --------------------------------------------------------------------
+% {
+% \setbeamertemplate{navigation symbols}{}
+% \begin{frame}[plain]{Slide without header}
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ac sem nibh, at iaculis nisl. Etiam condimentum mauris vel nibh volutpat gravida. Sed sit amet gravida nibh. Nulla facilisi. Nunc feugiat pharetra urna at laoreet. Donec adipiscing eros non orci scelerisque sed dictum turpis elementum. Integer tempus interdum urna ultricies rhoncus.
+% \vspace{\baselineskip}
+
+% Praesent at eros ac ante facilisis aliquam. Phasellus euismod quam eu nunc commodo vel semper mi sodales. In accumsan est non dui scelerisque condimentum. Maecenas justo dui, facilisis eleifend aliquet et, condimentum et est.
+% \vspace{\baselineskip}
+
+% Fusce tincidunt interdum elementum. Quisque molestie velit vel est vehicula sit amet dapibus turpis laoreet. Quisque sagittis lorem eget dui pellentesque congue. Suspendisse egestas interdum scelerisque. Pellentesque ac urna nec tellus viverra sagittis vel vitae leo.
+% \end{frame}
+% }
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}[fragile]{\LaTeX-code: Slide without header}
+% \footnotesize
+% \verb|{%|\\
+% \verb|\setbeamertemplate{navigation symbols}{}%|\\
+% \verb|\begin{frame}[plain]{Slide without header}|\\
+% \verb|  Lorem ipsum dolor sit amet, [...]|\\
+% \verb|  \vspace{\baselineskip}|\\
+% \verb||\\
+% \verb|  Praesent at eros ac ante facilisis aliquam. [...]|\\
+% \verb|  \vspace{\baselineskip}|\\
+% \verb||\\
+% \verb|  Fusce tincidunt interdum elementum. [...]|\\
+% \verb|\end{frame}|\\
+% \verb|}%|\\
+% \end{frame}
+% \toggleslidecolors
+
+
+% % --------------------------------------------------------------------
+% \begin{frame}{Columns on slide}
+% \begin{columns}
+% \begin{column}{.45\textwidth}
+% \liketitle{Column 1}
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Nullam lectus tortor, blandit sed ullamcorper nec, imperdiet et libero. Vivamus quis eros diam, nec convallis sapien. Praesent tortor lectus, sagittis a malesuada non, venenatis quis justo.
+% \end{column}
+% \begin{column}{.45\textwidth}
+% \liketitle{Column 2}
+% Aliquam erat volutpat. Etiam tortor urna, mattis vitae ornare luctus, accumsan vel mi. Phasellus sed adipiscing mi. Curabitur orci tellus, imperdiet eget facilisis quis, consequat suscipit velit. Nunc vel nisi lorem, non malesuada turpis.
+% \end{column}
+% \end{columns}
+% \end{frame}
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}[fragile]{\LaTeX-code: Columns on slide}
+% \footnotesize
+% \verb|\begin{frame}{Columns on slide}|\\
+% \verb|\begin{columns}|\\
+% \verb|  \begin{column}[l]{.45\textwidth}|\\
+% \verb|    \liketitle{Column 1}|\\
+% \verb|    Lorem ipsum dolor sit amet, consectetur adipiscing elit. [...]|\\
+% \verb|  \end{column}|\\
+% \verb|  \begin{column}[l]{.45\textwidth}|\\
+% \verb|    \liketitle{Column 2}|\\
+% \verb|    Aliquam erat volutpat. Etiam tortor urna, [...]|\\
+% \verb|  \end{column}|\\
+% \verb|\end{columns}|\\
+% \verb|\end{frame}|\\
+% \end{frame}
+% \toggleslidecolors
+
+% % --------------------------------------------------------------------
+% \begin{frame}{Block on slide}
+% \begin{block}{Block title}
+% Pellentesque libero augue, molestie in dignissim at, rutrum vel dolor. Vestibulum ut eros vitae enim auctor malesuada ac eget velit. Etiam tellus tellus, dignissim id lobortis eget, vestibulum non dolor. Morbi facilisis iaculis tempus. In sed nisi justo. In hac habitasse platea dictumst. Suspendisse mattis orci orci, id adipiscing tortor.
+% \end{block}
+% \end{frame}
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}[fragile]{\LaTeX-code: Block on slide}
+% \footnotesize
+% \verb|\begin{frame}{Block on slide}|\\
+% \verb|  \begin{block}{Block title}|\\
+% \verb|    Pellentesque libero augue, molestie in dignissim at,|\\
+% \verb|    rutrum vel dolor. Vestibulum ut eros vitae enim auctor|\\
+% \verb|    malesuada ac eget velit. [...]|\\
+% \verb|  \end{block}|\\
+% \verb|\end{frame}|\\
+% \end{frame}
+% \toggleslidecolors
+
+% % --------------------------------------------------------------------
+% \backgroundimageonslide{img/chalkboard}
+% \begin{frame}{Slide with background image}
+% \begin{itemize}
+% \item And now a slide with a background image.
+% \end{itemize}
+% \end{frame}
+% \backgroundimageonslide{}
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}[fragile]{\LaTeX-code: Slide with background image}
+% \footnotesize
+% \verb|{%|\\
+% \verb|\setbeamertemplate{navigation symbols}{}%|\\
+% \verb|\backgroundimageonslide{img/chalkboard}%|\\
+% \verb|\begin{frame}{Slide with background image}|\\
+% \verb|  \begin{itemize}|\\
+% \verb|  \item And now a slide with a background image.|\\
+% \verb|  \end{itemize}|\\
+% \verb|\end{frame}|\\
+% \verb|\backgroundimageonslide{}%|\\
+% \verb|}%|\\
+% \end{frame}
+% \toggleslidecolors
+
+% % --------------------------------------------------------------------
+% {
+% \setbeamertemplate{navigation symbols}{}
+% \backgroundimageonslide{img/chalkboard}
+% \begin{frame}[plain]{Slide without header, with background}
+% Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus ac sem nibh, at iaculis nisl. Etiam condimentum mauris vel nibh volutpat gravida. Sed sit amet gravida nibh. Nulla facilisi. Nunc feugiat pharetra urna at laoreet. Donec adipiscing eros non orci scelerisque sed dictum turpis elementum. Integer tempus interdum urna ultricies rhoncus.
+% \vspace{\baselineskip}
+
+% Praesent at eros ac ante facilisis aliquam. Phasellus euismod quam eu nunc commodo vel semper mi sodales. In accumsan est non dui scelerisque condimentum. Maecenas justo dui, facilisis eleifend aliquet et, condimentum et est.
+% \vspace{\baselineskip}
+
+% Fusce tincidunt interdum elementum. Quisque molestie velit vel est vehicula sit amet dapibus turpis laoreet. Quisque sagittis lorem eget dui pellentesque congue. Suspendisse egestas interdum scelerisque. Pellentesque ac urna nec tellus viverra sagittis vel vitae leo.
+% \end{frame}
+% \backgroundimageonslide{}
+% }
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}[fragile]{\LaTeX-code: Slide without header, [\ldots]}
+% \footnotesize
+% \verb|{%|\\
+% \verb|\setbeamertemplate{navigation symbols}{}%|\\
+% \verb|\backgroundimageonslide{img/chalkboard}%|\\
+% \verb|\begin{frame}[plain]{Slide without header, with background}|\\
+% \verb|  Lorem ipsum dolor sit amet, [...]|\\
+% \verb|  \vspace{\baselineskip}|\\
+% \verb||\\
+% \verb|  Praesent at eros ac ante facilisis aliquam. [...]|\\
+% \verb|  \vspace{\baselineskip}|\\
+% \verb||\\
+% \verb|  Fusce tincidunt interdum elementum. [...]|\\
+% \verb|\end{frame}|\\
+% \verb|\backgroundimageonslide{}%|\\
+% \verb|}%|\\
+% \end{frame}
+% \toggleslidecolors
+
+% % --------------------------------------------------------------------
+% \begin{frame}{Slide with image}
+% \vfill % Vertical centering
+% \begin{figure}
+% \includegraphics[width=.99\textwidth,height=.75\textheight,keepaspectratio]{img/dilbert-on-ppt}
+% \caption{Dilbert's take on PowerPoint\ldots}
+% \end{figure}
+% \end{frame}
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}[fragile]{\LaTeX-code: Slide with image}
+% \footnotesize
+% \verb|\begin{frame}{Slide with image}|\\
+% \verb|  \vfill % Vertical centering|\\
+% \verb|  \begin{figure}|\\
+% \verb|    \includegraphics[width=.99\textwidth,height=.75\textheight,%|\\
+% \verb|      keepaspectratio]{img/dilbert-on-ppt}|\\
+% \verb|    \caption{Dilbert's take on PowerPoint\ldots}|\\
+% \verb|\end{figure}|\\
+% \verb|\end{frame}|\\
+% \end{frame}
+% \toggleslidecolors
+
+% % --------------------------------------------------------------------
+% \begin{frame}[fragile]{Table on slide}
+% \vfill % Vertical centering
+% \begin{center}
+% \begin{table}[ht!]
+% \begin{tabular}{@{}lr@{}}
+% \toprule
+% \alert{Class} & \alert{Frequency} \\ 
+% \midrule
+% 1 - 2 & 12\\
+% 3 - 4 & 6\\
+% 5 - 6 & 45\\
+% \bottomrule
+% \end{tabular}
+% \caption{Simple sample table}
+% \end{table}
+% \end{center}
+% \end{frame}
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}[fragile]{\LaTeX-code: Table on slide}
+% \footnotesize
+% \verb|\begin{frame}[fragile]{Table on slide}|\\
+% \verb|  \vfill % Vertical centering|\\
+% \verb|  \begin{center}|\\
+% \verb|    \begin{table}[ht!]|\\
+% \verb|       \begin{tabular}{@{}lr@{}}|\\
+% \verb|       \toprule|\\
+% \verb|       \alert{Class} & \alert{Frequency} \\ |\\
+% \verb|       \midrule|\\
+% \verb|       1 - 2 & 12\\|\\
+% \verb|       3 - 4 & 6\\|\\
+% \verb|       \bottomrule|\\
+% \verb|       \end{tabular}|\\
+% \verb|       \caption{Simple sample table}|\\
+% \verb|    \end{table}|\\
+% \verb|  \end{center}|\\
+% \verb|\end{frame}|\\
+% \end{frame}
+% \toggleslidecolors
+
+
+% % --------------------------------------------------------------------
+% \begin{frame}[fragile]{Code on slide}
+% \alert{Hello word program in C:}
+% \begin{lstlisting}
+% #include <stdio.h>
+ 
+% int main(void) {
+%     printf("hello, world\n");
+%     return 0;
+% }
+% \end{lstlisting}
+% \end{frame}
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}[fragile]{\LaTeX-code: Code on slide}
+% \footnotesize
+% \verb|\usepackage{listings}|\\
+% \verb||\\
+% \verb|\begin{frame}{Code on slide}|\\
+% \verb|\alert{Hello word program in C:}|\\
+% \verb|\begin{lstlisting}|\\
+% \verb|#include <stdio.h>|\\
+% \verb||\\
+% \verb|int main(void) {|\\
+% \verb|    printf("hello, world\n");|\\
+% \verb|    return 0;|\\
+% \verb|}|\\
+% \verb|\end{lstlisting}|\\
+% \verb|\end{frame}|\\
+% \end{frame}
+% \toggleslidecolors
+
+
+% % --------------------------------------------------------------------
+% \begin{frame}{Easy diagram on slide}
+% \vfill % Vertical centering
+% \begin{center}
+% \begin{tikzpicture}
+%   [node distance=.4cm, start chain=going right]
+%   \tikzstyle{box}=[
+%     rectangle, rounded corners, text width=6em, minimum height=1.5em, 
+%     fill=normal text.fg!30!normal text.bg,
+%     draw=normal text.fg, very thick, text centered,
+%     on chain];
+%   \tikzstyle{line}= [draw, thick, <-];
+%   \tikzstyle{every join} = [->, thick, shorten >=1pt];
+
+%   \node[box, join] (step1)	{Step 1};
+%   \node[box, join] (step2)	{Step 2};
+%   \node[box, join] (step3)	{Step 3};
+% \end{tikzpicture}
+% \end{center}
+% \end{frame}
+
+% % --------------------------------------------------------------------
+% \toggleslidecolors
+% \begin{frame}[fragile]{\LaTeX-code: Easy diagram on slide}
+% \scriptsize
+% \verb|\begin{frame}{Easy diagram on slide}|\\
+% \verb|\vfill % Vertical centering|\\
+% \verb|\begin{center}|\\
+% \verb|\begin{tikzpicture}|\\
+% \verb|  [node distance=.4cm, start chain=going right]|\\
+% \verb|  \tikzstyle{box}=[|\\
+% \verb|    rectangle, rounded corners, text width=6em, minimum height=1.5em,|\\
+% \verb|    fill=normal text.fg!30!normal text.bg,|\\
+% \verb|    draw=normal text.fg, very thick, text centered,|\\
+% \verb|    on chain];|\\
+% \verb|  \tikzstyle{line}= [draw, thick, <-];|\\
+% \verb|  \tikzstyle{every join} = [->, thick, shorten >=1pt];|\\
+% \verb||\\
+% \verb|  \node[box, join] (step1)	{Step 1};|\\
+% \verb|  \node[box, join] (step2)	{Step 2};|\\
+% \verb|  \node[box, join] (step3)	{Step 3};|\\
+% \verb|\end{tikzpicture}|\\
+% \verb|\end{center}|\\
+% \verb|\end{frame}|\\
+% \end{frame}
+% \toggleslidecolors
+
+
+
+% % ====================================================================
+% \section{Colofon}
+
+
+% % --------------------------------------------------------------------
+% \begin{frame}{Colofon}
+% \vfill % Vertical centering
+% \begin{center}
+% \alert{\large Original theme by:}\\
+% {\LARGE Joost Schalken}\\
+% {\tiny Updated by: Pepijn van Heiningen}
+% \end{center}
+% \end{frame}
+
+\end{document}
