@@ -308,8 +308,3 @@ var = pd.read_csv('analysis/results/mcs_stellar_variability_estimates.csv')
 - Evolved stars (logg <3.5): Variability may be underestimated
 - Systems with P_rot >100 days: May have minimal spot modulation
 
----
-
-**Author:** GitHub Copilot  
-**Contact:** See project documentation  
-**Version:** 1.0 (January 2026)
